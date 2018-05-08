@@ -44,9 +44,15 @@ class CommunicationService : JobService() {
         @JvmStatic val TAG = JobService::class.java.simpleName!!
 
         private var serviceState = ServiceState.STOPPED
+        private val stopwatch = Stopwatch()
+        private const val jobId: Int = 0
+
+        val isServiceActive
+            get() = serviceState == ServiceState.STARTING || serviceState == ServiceState.STARTED
 
         fun startService(context: Context) {
             serviceState = ServiceState.STARTING
+            stopwatch.start()
 
             val timerJobServiceComponent = ComponentName(context, CommunicationService::class.java)
             val timerJobTask = JobInfo.Builder(jobId, timerJobServiceComponent)
@@ -59,17 +65,15 @@ class CommunicationService : JobService() {
 
         fun stopService(context: Context) {
             serviceState = ServiceState.STOPPING
+            stopwatch.stop()
 
             getJobScheduler(context).cancel(jobId)
         }
-
-        private const val jobId: Int = 0
 
         private fun getJobScheduler(context: Context): JobScheduler {
             return context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
         }
 
-        // Make this static so it survives unexpected service restarts.
         private var lastSpokenMinutes = 0L
 
         private fun resetLastSpokenMinutes() {
@@ -105,18 +109,18 @@ class CommunicationService : JobService() {
                 val state = data.getUnsignedIntegerAsLong(Constants.SPORTS_STATE_KEY).toInt()
                 when (state) {
                     1 -> { // Pause signal
-                        if (Stopwatch.instance.isStarted && !Stopwatch.instance.isPaused) {
+                        if (!stopwatch.isPaused) {
                             Log.i(TAG, "Pausing")
-                            Stopwatch.instance.pause()
+                            stopwatch.pause()
                             communicateInformation()
                             stopPeriodicCommunicaton()
                             speak(getString(R.string.voice_paused))
                         }
                     }
                     2 -> { // Resume signal
-                        if (Stopwatch.instance.isStarted && Stopwatch.instance.isPaused) {
+                        if (stopwatch.isPaused) {
                             Log.i(TAG, "Resuming")
-                            Stopwatch.instance.resume()
+                            stopwatch.resume()
                             communicateInformation()
                             startPeriodicCommunication()
                             speak(getString(R.string.voice_resumed))
@@ -149,7 +153,7 @@ class CommunicationService : JobService() {
             try {
                 applicationContext.unregisterReceiver(pebbleDataReceiver)
             } catch (e: Exception) {
-                e.printStackTrace()
+                Log.e(TAG, "Failed to unregister ${PebbleKit.PebbleDataReceiver::class.java.simpleName}", e)
             }
         }
 
@@ -181,7 +185,7 @@ class CommunicationService : JobService() {
     }
 
     private fun communicateInformation() {
-        val elapsedTime = Stopwatch.instance.elapsedTime
+        val elapsedTime = stopwatch.elapsedTime
 
         val minutes = elapsedTime / 60L
         val seconds = elapsedTime % 60L

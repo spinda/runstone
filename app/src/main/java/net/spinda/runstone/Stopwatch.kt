@@ -22,10 +22,6 @@ package net.spinda.runstone
 import android.os.SystemClock
 
 class Stopwatch {
-    companion object {
-        val instance = Stopwatch()
-    }
-
     private var startTimestamp: Long = 0
     private var pauseTimestamp: Long = 0
 
@@ -51,6 +47,7 @@ class Stopwatch {
 
     fun start() {
         startTimestamp = timestampInSeconds()
+        pauseTimestamp = 0
     }
 
     fun pause() {
