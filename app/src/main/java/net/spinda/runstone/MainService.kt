@@ -30,6 +30,7 @@ import android.util.Log
 import com.getpebble.android.kit.Constants
 import com.getpebble.android.kit.PebbleKit
 import com.getpebble.android.kit.util.PebbleDictionary
+import java.util.*
 
 class MainService : JobService() {
     private enum class ServiceState {
@@ -104,7 +105,11 @@ class MainService : JobService() {
             resetLastSpokenMinutes()
         }
 
+        // Start the built-in Pebble Sports app (required for the Sports API to function properly).
         PebbleKit.startAppOnPebble(applicationContext, Constants.SPORTS_UUID)
+
+        // Start Music Boss Sport, if it's installed.
+        PebbleKit.startAppOnPebble(applicationContext, UUID.fromString("10e5ae7b-9b4b-4fd0-9708-4bf9bce5033d"))
 
         val pebbleDataReceiver = object : PebbleKit.PebbleDataReceiver(Constants.SPORTS_UUID) {
             override fun receiveData(context: Context?, id: Int, data: PebbleDictionary?) {
@@ -168,6 +173,7 @@ class MainService : JobService() {
             }
         }
 
+        // Close the built-in Pebble Sports app, if open (required for the Sports API to function properly).
         PebbleKit.closeAppOnPebble(applicationContext, Constants.SPORTS_UUID);
 
         if (initialServiceState == ServiceState.STOPPING) {
