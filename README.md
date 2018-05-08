@@ -2,6 +2,8 @@
 
 > Android + Pebble app for timing my morning run
 
+[![Build Status](https://img.shields.io/travis/spinda/runstone.svg)](https://travis-ci.org/spinda/runstone)
+
 ## Overview
 
 RunStone works like a stopwatch.
