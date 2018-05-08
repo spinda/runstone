@@ -120,7 +120,7 @@ class MainService : JobService() {
                         if (!stopwatch.isPaused) {
                             Log.i(TAG, "Pausing")
                             stopwatch.pause()
-                            communicateInformation()
+                            communicateTime()
                             stopPeriodicCommunicaton()
                             tts?.speak(getString(R.string.voice_paused))
                         }
@@ -129,7 +129,7 @@ class MainService : JobService() {
                         if (stopwatch.isPaused) {
                             Log.i(TAG, "Resuming")
                             stopwatch.resume()
-                            communicateInformation()
+                            communicateTime()
                             startPeriodicCommunication()
                             tts?.speak(getString(R.string.voice_resumed))
                         }
@@ -140,7 +140,7 @@ class MainService : JobService() {
         PebbleKit.registerReceivedDataHandler(applicationContext, pebbleDataReceiver)
         this.pebbleDataReceiver = pebbleDataReceiver
 
-        communicateInformation()
+        communicateTime()
         startPeriodicCommunication()
 
         return true
@@ -182,7 +182,7 @@ class MainService : JobService() {
 
     private fun startPeriodicCommunication() {
         periodicCommunicationRunnable = startTimer(1000, Runnable {
-            communicateInformation()
+            communicateTime()
         })
     }
 
@@ -194,7 +194,7 @@ class MainService : JobService() {
         }
     }
 
-    private fun communicateInformation() {
+    private fun communicateTime() {
         val elapsedTime = stopwatch.elapsedTime
 
         val minutes = elapsedTime / 60L
@@ -211,11 +211,11 @@ class MainService : JobService() {
         PebbleKit.sendDataToPebble(applicationContext, Constants.SPORTS_UUID, msg)
 
         if (isUnspokenMinutes(minutes)) {
-            tts?.speakQueued(if (minutes == 1L) {
+            tts?.speak(if (minutes == 1L) {
                 getString(R.string.voice_minute)
             } else {
                 getString(R.string.voice_minutes_template).format(minutes)
-            })
+            }, false)
             lastSpokenMinutes = minutes
         }
     }

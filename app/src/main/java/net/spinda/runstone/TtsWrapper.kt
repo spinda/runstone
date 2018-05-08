@@ -24,7 +24,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import java.util.*
 
-class TtsWrapper(context: Context) {
+class TtsWrapper(private val context: Context) {
     companion object {
         @JvmStatic
         val TAG = TtsWrapper::class.java.simpleName!!
@@ -59,30 +59,28 @@ class TtsWrapper(context: Context) {
         }
     }
 
-    private val tts: TextToSpeech
+    private var tts: TextToSpeech
 
     init {
-        Log.i(TAG, "constructing, why")
         tts = TextToSpeech(context, onInitListener)
     }
 
-    fun speak(text: String) {
-        when (state) {
-            State.INITIALIZING -> pendingText = text
-            State.FAILED -> {}
-            State.READY -> {
-                tts.stop()
-                tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
-            }
-        }
-    }
-
-    fun speakQueued(text: String) {
+    fun speak(text: String, interrupt: Boolean = true) {
         when (state) {
             State.INITIALIZING -> pendingText += "\n" + text
-            State.FAILED -> {}
+            State.FAILED -> {
+                state = State.INITIALIZING
+                pendingText = text
+                tts = TextToSpeech(context, onInitListener)
+            }
             State.READY -> {
-                tts.speak(text, TextToSpeech.QUEUE_ADD, null, null)
+                val queueMode = if (interrupt) {
+                    tts.stop()
+                    TextToSpeech.QUEUE_FLUSH
+                } else {
+                    TextToSpeech.QUEUE_ADD
+                }
+                tts.speak(text, queueMode, null, null)
             }
         }
     }
