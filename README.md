@@ -2,6 +2,8 @@
 
 > Android + Pebble app for timing my morning run
 
+Install: [APK](https://github.com/spinda/runstone/releases)
+
 [![Build Status](https://img.shields.io/travis/spinda/runstone.svg)](https://travis-ci.org/spinda/runstone)
 
 ## Overview
