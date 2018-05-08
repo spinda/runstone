@@ -35,7 +35,7 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
         </activity>
 
         <service
-            android:name=".CommunicationService"
+            android:name=".MainService"
             android:label="Timer service"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 

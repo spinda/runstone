@@ -38,16 +38,16 @@ class MainActivity : AppCompatActivity() {
         stopwatchSwitch = findViewById(R.id.stopwatchSwitch)
         stopwatchSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
-                if (!CommunicationService.isServiceActive) {
-                    CommunicationService.startService(applicationContext)
+                if (!MainService.isServiceActive) {
+                    MainService.startService(applicationContext)
                 }
             } else {
-                if (CommunicationService.isServiceActive) {
-                    CommunicationService.stopService(applicationContext)
+                if (MainService.isServiceActive) {
+                    MainService.stopService(applicationContext)
                 }
             }
         }
 
-        stopwatchSwitch.isChecked = CommunicationService.isServiceActive
+        stopwatchSwitch.isChecked = MainService.isServiceActive
     }
 }

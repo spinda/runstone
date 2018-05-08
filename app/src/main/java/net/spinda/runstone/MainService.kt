@@ -31,7 +31,7 @@ import com.getpebble.android.kit.Constants
 import com.getpebble.android.kit.PebbleKit
 import com.getpebble.android.kit.util.PebbleDictionary
 
-class CommunicationService : JobService() {
+class MainService : JobService() {
     private enum class ServiceState {
         STARTING,
         STARTED,
@@ -41,7 +41,7 @@ class CommunicationService : JobService() {
 
     companion object {
         @JvmStatic
-        val TAG = CommunicationService::class.java.simpleName!!
+        val TAG = MainService::class.java.simpleName!!
 
         private var serviceState = ServiceState.STOPPED
         private val stopwatch = Stopwatch()
@@ -54,7 +54,7 @@ class CommunicationService : JobService() {
             serviceState = ServiceState.STARTING
             stopwatch.start()
 
-            val timerJobServiceComponent = ComponentName(context, CommunicationService::class.java)
+            val timerJobServiceComponent = ComponentName(context, MainService::class.java)
             val timerJobTask = JobInfo.Builder(jobId, timerJobServiceComponent)
                     .setMinimumLatency(1)
                     .setOverrideDeadline(1)
