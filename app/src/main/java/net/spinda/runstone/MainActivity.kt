@@ -25,7 +25,8 @@ import android.widget.Switch
 
 class MainActivity : AppCompatActivity() {
     companion object {
-        @JvmStatic val TAG = MainActivity::class.java.simpleName!!
+        @JvmStatic
+        val TAG = MainActivity::class.java.simpleName!!
     }
 
     private lateinit var stopwatchSwitch: Switch

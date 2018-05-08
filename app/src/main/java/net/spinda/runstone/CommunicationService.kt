@@ -26,7 +26,6 @@ import android.app.job.JobService
 import android.content.ComponentName
 import android.content.Context
 import android.os.Handler
-import android.speech.tts.TextToSpeech
 import android.util.Log
 import com.getpebble.android.kit.Constants
 import com.getpebble.android.kit.PebbleKit
@@ -41,7 +40,8 @@ class CommunicationService : JobService() {
     }
 
     companion object {
-        @JvmStatic val TAG = JobService::class.java.simpleName!!
+        @JvmStatic
+        val TAG = CommunicationService::class.java.simpleName!!
 
         private var serviceState = ServiceState.STOPPED
         private val stopwatch = Stopwatch()
@@ -74,6 +74,8 @@ class CommunicationService : JobService() {
             return context.getSystemService(Context.JOB_SCHEDULER_SERVICE) as JobScheduler
         }
 
+        private var tts: TtsWrapper? = null
+
         private var lastSpokenMinutes = 0L
 
         private fun resetLastSpokenMinutes() {
@@ -88,13 +90,19 @@ class CommunicationService : JobService() {
     private var pebbleDataReceiver: PebbleKit.PebbleDataReceiver? = null
 
     override fun onStartJob(params: JobParameters?): Boolean {
-        Log.i(TAG, "Job start (serviceState = $serviceState)")
+        val initialServiceState = serviceState
+        serviceState = ServiceState.STARTED
 
-        if (serviceState == ServiceState.STARTING) {
-            speak(getString(R.string.voice_started))
+        Log.i(TAG, "Job start (initialServiceState = $initialServiceState)")
+
+        if (tts == null) {
+            tts = TtsWrapper(applicationContext)
+        }
+
+        if (initialServiceState == ServiceState.STARTING) {
+            tts?.speak(getString(R.string.voice_started))
             resetLastSpokenMinutes()
         }
-        serviceState = ServiceState.STARTED
 
         PebbleKit.startAppOnPebble(applicationContext, Constants.SPORTS_UUID)
 
@@ -114,7 +122,7 @@ class CommunicationService : JobService() {
                             stopwatch.pause()
                             communicateInformation()
                             stopPeriodicCommunicaton()
-                            speak(getString(R.string.voice_paused))
+                            tts?.speak(getString(R.string.voice_paused))
                         }
                     }
                     2 -> { // Resume signal
@@ -123,7 +131,7 @@ class CommunicationService : JobService() {
                             stopwatch.resume()
                             communicateInformation()
                             startPeriodicCommunication()
-                            speak(getString(R.string.voice_resumed))
+                            tts?.speak(getString(R.string.voice_resumed))
                         }
                     }
                 }
@@ -139,7 +147,10 @@ class CommunicationService : JobService() {
     }
 
     override fun onStopJob(params: JobParameters?): Boolean {
-        Log.i(TAG, "Job stop (serviceState = $serviceState)")
+        val initialServiceState = serviceState
+        serviceState = ServiceState.STOPPED
+
+        Log.i(TAG, "Job stop (initialServiceState = $initialServiceState)")
 
         val tickTimerRunnable = periodicCommunicationRunnable
         this.periodicCommunicationRunnable = null
@@ -159,13 +170,12 @@ class CommunicationService : JobService() {
 
         PebbleKit.closeAppOnPebble(applicationContext, Constants.SPORTS_UUID);
 
-        if (serviceState == ServiceState.STOPPING) {
-            serviceState = ServiceState.STOPPED
-            speak(getString(R.string.voice_stopped))
+        if (initialServiceState == ServiceState.STOPPING) {
+            tts?.speak(getString(R.string.voice_stopped))
         }
 
         // Restart if we weren't meant to be stopping now (the Android system is shutting us down for whatever reason).
-        return serviceState != ServiceState.STOPPED
+        return initialServiceState != ServiceState.STOPPED
     }
 
     private var periodicCommunicationRunnable: Runnable? = null
@@ -201,27 +211,12 @@ class CommunicationService : JobService() {
         PebbleKit.sendDataToPebble(applicationContext, Constants.SPORTS_UUID, msg)
 
         if (isUnspokenMinutes(minutes)) {
-            speak(if (minutes == 1L) {
+            tts?.speakQueued(if (minutes == 1L) {
                 getString(R.string.voice_minute)
             } else {
                 getString(R.string.voice_minutes_template).format(minutes)
             })
             lastSpokenMinutes = minutes
-        }
-    }
-
-    private fun speak(text: String) {
-        // Hack around Kotlin's variable access limitations so that we can access the TextToSpeech reference from within
-        // the initialization listener.
-        object {
-            val value: TextToSpeech get() = inner
-            private val inner = TextToSpeech(applicationContext, { status: Int ->
-                if (status == TextToSpeech.SUCCESS) {
-                    value.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
-                } else {
-                    Log.e(TAG, "TTS initialization failed")
-                }
-            })
         }
     }
 

@@ -35,11 +35,11 @@ with this program. If not, see <http://www.gnu.org/licenses/>.
         While you\'re running, voice prompts will announce the elapsed time at one-minute intervals.
     </string>
 
-    <string name="voice_started">Run started</string>
-    <string name="voice_stopped">Run ended</string>
-    <string name="voice_paused">Run paused</string>
-    <string name="voice_resumed">Run resumed</string>
-    <string name="voice_minute">1 minute has elapsed</string>
-    <string name="voice_minutes_template">%d minutes have elapsed</string>
+    <string name="voice_started">Run started.</string>
+    <string name="voice_stopped">Run ended.</string>
+    <string name="voice_paused">Run paused.</string>
+    <string name="voice_resumed">Run resumed.</string>
+    <string name="voice_minute">1 minute has elapsed.</string>
+    <string name="voice_minutes_template">%d minutes have elapsed.</string>
 
 </resources>
