@@ -67,7 +67,13 @@ class TtsWrapper(private val context: Context) {
 
     fun speak(text: String, interrupt: Boolean = true) {
         when (state) {
-            State.INITIALIZING -> pendingText += "\n" + text
+            State.INITIALIZING -> {
+                pendingText = if (interrupt) {
+                    text
+                } else {
+                    pendingText + "\n" + text
+                }
+            }
             State.FAILED -> {
                 state = State.INITIALIZING
                 pendingText = text
