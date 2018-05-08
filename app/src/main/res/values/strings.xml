@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of RunStone, a simple run timer app for use with Android and
+the Pebble smartwatch.
+
+Copyright (C) 2018 Michael Smith <michael@spinda.net>
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the Free
+Software Foundation, either version 3 of the License, or (at your option) any
+later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU Affero General Public License for more details.
+
+You should have received a copy of the GNU Affero General Public License along
+with this program. If not, see <http://www.gnu.org/licenses/>.
+-->
+<resources>
+
+    <string name="app_name">RunStone</string>
+
+    <string name="stopwatch_running">Stopwatch Running</string>
+
+    <string name="intro_switch_on">
+        Toggle on the switch above to start the stopwatch. This will launch the Sports app on your Pebble, where you\'ll be
+        able to view the elapsed time, pause, and resume.
+        </string>
+    <string name="intro_switch_off">
+        To save battery, don\'t forget to toggle the switch back off when your run is done. The app will continue to run in
+        the background while the switch is enabled, even when your phone screen is off.
+    </string>
+    <string name="intro_voice_prompts">
+        While you\'re running, voice prompts will announce the elapsed time at one-minute intervals.
+    </string>
+
+    <string name="voice_started">Run started</string>
+    <string name="voice_stopped">Run ended</string>
+    <string name="voice_paused">Run paused</string>
+    <string name="voice_resumed">Run resumed</string>
+    <string name="voice_minute">1 minute has elapsed</string>
+    <string name="voice_minutes_template">%d minutes have elapsed</string>
+
+</resources>
